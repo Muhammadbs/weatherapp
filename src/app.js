@@ -1,12 +1,11 @@
-require('dotenv').config(); // Load env variables
+require('dotenv').config();
 const express = require("express");
 const hbs = require("hbs");
 const path = require("path");
-const saveLog = require('../utils/saveLog'); // Import logger
-
-const app = express();
+const saveLog = require('../utils/saveLog');
 const weatherData = require("../utils/weatherData");
 
+const app = express();
 const port = process.env.PORT || 3000;
 
 const publicPath = path.join(__dirname, "../public");
@@ -34,11 +33,8 @@ app.get("/weather", (req, res) => {
 
     res.send(result);
 
-    // Get requester's IP
     const requesterIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-
-    // Save to Supabase
-    await saveLog(req.query.address, result, requesterIP);
+    await saveLog(requesterIP, result, "Weather data fetched");
   });
 });
 

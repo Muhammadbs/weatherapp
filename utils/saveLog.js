@@ -1,17 +1,25 @@
 const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 
-async function saveLog(city, response, ip) {
-  const { data, error } = await supabase
-    .from('weather_logs')
-    .insert([{ city, response, ip }]);
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const saveToSupabase = async (ip, weatherData, suggestion) => {
+  const data = {
+    ip_address: ip,
+    timestamp: new Date().toISOString(),
+    weather_data: weatherData,
+    suggestion: suggestion || null,
+  };
+
+  const { error } = await supabase.from('api_requests').insert([data]);
 
   if (error) {
-    console.error('Error saving to Supabase:', error);
+    console.error("Failed to save to Supabase:", error.message);
   } else {
-    console.log('Saved log to Supabase:', data);
+    console.log("Request logged to Supabase");
   }
-}
+};
 
-module.exports = saveLog;
+module.exports = saveToSupabase;
